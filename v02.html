@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Redux Default basic example</title>
+	   <script type="text/javascript" src="https://npmcdn.com/redux@latest/dist/redux.min.js"></script>
+  </head>
+  <body>
+    <div>
+      <p>
+        Clicked: <span id="value"></span> times
+        <button id="decrement">Decrease</button>
+        <button id="incrementAsync">Increment async</button>
+		  
+		   <button id="sum">sum</button>
+      </p>
+    </div>
+    <script>
+      var store = Redux.createStore(counter);
+		
+      var valueEl = document.getElementById('value');
+
+      function render() {
+		  console.log(store.getState());
+        valueEl.innerHTML = store.getState().count; 
+      }
+
+      render();
+		//store.subscribe ile state değişimlerini render fonksiyonuna yansıtıyoruz.
+	 store.subscribe(render);
+
+		//ilk olarak store nesnemizi yaratıyoruz ve store nesnesi counter adında bir reducer fonksiyon alıyor
+		// bu reducer fonksiyonu ilk parametresi state nesnesi alıyor burada state nesnesi currentstate objemiz
+		// eğer current state ilk çağırışta yoksa, ki yok, burada default state ile nesnemize default değerleri 
+		//atıyoruz.
+		
+		// counter reducer fonksiyonun ikinci parametresi ise action fonsiyonudur. Bu action ile gelen değere göre
+		// state nesnesi güncellenir. bu güncelleme daha sonra store.subscribe ile tekrardan rendera yansıtılır.
+		
+	  function counter(currentState, action){
+		  var default_state = {count:0 ,sum:0}
+		  var next_state = Object.assign({}, currentState)
+		  
+		  if(currentState === undefined)
+			  {
+				  next_state = default_state
+				  return next_state;
+			  }
+		  
+		  switch(action.type)
+			  {
+				  case 'decrement':
+					  next_state.count = currentState.count - 1;
+					  return next_state;
+					  break;
+			      case 'sum':
+					  next_state.sum = action.a + action.b;
+					  return next_state;
+					  break;
+				  default:
+					  return next_state;
+					  break
+			  }
+	  }
+		
+	/*	
+      document.getElementById('decrement')
+        .addEventListener('click', function () {
+            valueEl.innerHTML = valueEl.innerHTML - 1;
+        })
+*/
+		
+	document.getElementById('decrement').addEventListener('click',function(){
+		var action = { type:'decrement'}
+		store.dispatch(action);
+	})
+	
+	document.getElementById('sum').addEventListener('click',function(){
+		var action = { type:'sum', a:10, b: 15}
+		store.dispatch(action);
+	})
+      document.getElementById('incrementAsync')
+        .addEventListener('click', function () {
+          setTimeout(
+            function increment () {
+              valueEl.innerHTML = parseInt(valueEl.innerHTML) + 1;
+            }
+          , 1000); // execute increment () method after 1000 millisecond or 1 second
+        })
+    </script>
+  </body>
+</html>
